@@ -4,6 +4,8 @@ package com.parkinglot.parkinglot.Service;
 import com.parkinglot.parkinglot.Constants.ApplicationConstants;
 import com.parkinglot.parkinglot.Entity.Bay;
 import com.parkinglot.parkinglot.Entity.ParkingSlip;
+import com.parkinglot.parkinglot.Mappers.ResponseMapper;
+import com.parkinglot.parkinglot.Model.ParkingSlipResponse;
 import com.parkinglot.parkinglot.Model.Vehicle;
 import com.parkinglot.parkinglot.Repository.BaysRepo;
 import com.parkinglot.parkinglot.Repository.ParkingSlipRepo;
@@ -20,40 +22,44 @@ import java.util.Optional;
 public class Allocate {
     private final BaysRepo baysRepo;
     private final ParkingSlipRepo parkingSlipRepo;
+    private final ResponseMapper responseMapper;
 
     @Transactional
-    public ParkingSlip allocate(String parkingLotId, Vehicle vehicle) {
+    public ParkingSlipResponse allocate(String parkingLotId, Vehicle vehicle) {
         Optional<List<Bay>> bayList = baysRepo.findAllByParkingLot_IdAndIsAvailable(parkingLotId, true);
-        Optional<Bay> bay = getBayBySize(bayList,vehicle);
-        if(bay.isPresent()){
-            Bay bayDao=bay.get();
+        Optional<Bay> bay = getBayBySize(bayList, vehicle);
+        ParkingSlip parkingSlip = null;
+        if (bay.isPresent()) {
+            Bay bayDao = bay.get();
             bayDao.setIsAvailable(false);
-            Bay savedBay=baysRepo.save(bayDao);
-            return printParkingSlip(savedBay,vehicle);
+            Bay savedBay = baysRepo.save(bayDao);
+            parkingSlip = printParkingSlip(savedBay, vehicle);
 
-        } else{
-            return ParkingSlip.builder()
+        } else {
+            parkingSlip = ParkingSlip.builder()
                     .floorId(ApplicationConstants.NO_SLOT_FOUND)
-                    .slotId(ApplicationConstants.NO_SLOT_FOUND)
+                    .bayId(ApplicationConstants.NO_SLOT_FOUND)
                     .licensenseNo(vehicle.getLicenseNo())
                     .build();
         }
 
+        return responseMapper.parkingSlipToParkingSlipReponse(parkingSlip);
+
     }
 
-    private Optional<Bay> getBayBySize(Optional<List<Bay>>bayList, Vehicle vehicle) {
+    private Optional<Bay> getBayBySize(Optional<List<Bay>> bayList, Vehicle vehicle) {
         if (bayList.isPresent()) {
             return bayList.get().stream().filter(bays ->
-                            bays.getSlotSize() >= vehicle.getSize().getIndicator()
-                    && null!=bays.getIsAvailable()
-                                    && bays.getIsAvailable()==true)
+                            bays.getSlotSize() >= vehicle.getSize().getSize()
+                                    && null != bays.getIsAvailable()
+                                    && bays.getIsAvailable() == true)
                     .sorted(Comparator.comparing(Bay::getSlotSize)).findFirst();
         }
         return Optional.empty();
     }
 
-    private ParkingSlip printParkingSlip(Bay bay, Vehicle vehicle){
-       ParkingSlip parkingSlip= ParkingSlip.builder().slotId(bay.getId())
+    private ParkingSlip printParkingSlip(Bay bay, Vehicle vehicle) {
+        ParkingSlip parkingSlip = ParkingSlip.builder().bayId(bay.getId())
                 .floorId(bay.getFloor().getId())
                 .parkingLotId(bay.getParkingLot().getId())
                 .vehicleSize(bay.getSlotSize())

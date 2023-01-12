@@ -12,12 +12,12 @@ public class ParkingLot {
     @Column(name = "PARKING_LOT_ID")
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-   private String id;
-   private String name;
+    private String id;
+    private String name;
 
-   private long time_created;
-   private long time_updated;
+    private long time_created;
+    private long time_updated;
 
-   @OneToMany(mappedBy = "parkingLot")
+    @OneToMany(mappedBy = "parkingLot")
     private List<Floor> floors;
 }

@@ -7,9 +7,9 @@ import lombok.Data;
 @Entity
 @Data
 public class Bay {
-@Id
-@Column(name="BAY_ID")
-@GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @Column(name = "BAY_ID")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @NotNull
     private int slotSize;
@@ -22,7 +22,6 @@ public class Bay {
     @ManyToOne
     @JoinColumn(name = "FK_FLOOR_ID")
     private Floor floor;
-
 
 
 }

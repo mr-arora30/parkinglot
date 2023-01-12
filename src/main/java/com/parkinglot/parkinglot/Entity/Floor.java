@@ -19,10 +19,6 @@ public class Floor {
     private long noOfMBays;
     private long noOfLBays;
     private long noOfXLBays;
-    private long noOfUsedSBays;
-    private long noOfUsedMBays;
-    private long noOfUsedLBays;
-    private long noOfUsedXLBays;
     private long timeCreated;
     private long timeUpdated;
 
