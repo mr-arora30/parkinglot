@@ -11,7 +11,6 @@ import java.util.List;
 public class Floor {
     @Column(name = "FLOOR_ID")
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String parkingLotId;
     private long noOfBays;

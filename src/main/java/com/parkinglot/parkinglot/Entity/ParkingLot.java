@@ -11,7 +11,6 @@ import java.util.List;
 public class ParkingLot {
     @Column(name = "PARKING_LOT_ID")
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
 

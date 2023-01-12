@@ -2,6 +2,7 @@ package com.parkinglot.parkinglot.Controller;
 
 import com.parkinglot.parkinglot.Constants.ApplicationConstants;
 import com.parkinglot.parkinglot.Entity.ParkingSlip;
+import com.parkinglot.parkinglot.Model.ParkingDeallocateResponse;
 import com.parkinglot.parkinglot.Model.ParkingSlipResponse;
 import com.parkinglot.parkinglot.Model.Vehicle;
 import com.parkinglot.parkinglot.Service.Allocate;
@@ -30,7 +31,7 @@ public class Parking {
     @ResponseBody
     public ResponseEntity<ParkingSlipResponse> allocateSlot(@PathVariable(ApplicationConstants.PATH_PARAM_PARKING_LOT_ID) String parkingLotId,
                                                             @Valid @RequestBody Vehicle vehicle) {
-        ParkingSlipResponse response = allocate.allocate(parkingLotId, vehicle);
+        ParkingSlipResponse response = allocate.allocateSpot(parkingLotId, vehicle);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
 
@@ -39,13 +40,13 @@ public class Parking {
     @RequestMapping(value = "deallocate/{" + ApplicationConstants.PATH_PARAM_PARKING_LOT_ID + "}/{"
             + ApplicationConstants.PATH_PARAM_BAY_ID + "}",
             method = RequestMethod.POST,
-            consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public void deallocateSlot(@PathVariable(ApplicationConstants.PATH_PARAM_PARKING_LOT_ID)
-                               String parkingLotId,
-                               @PathVariable(ApplicationConstants.PATH_PARAM_BAY_ID)
-                               String bayId
+    public ResponseEntity<ParkingDeallocateResponse> deallocateSlot(@PathVariable(ApplicationConstants.PATH_PARAM_PARKING_LOT_ID)
+                                                                    String parkingLotId,
+                                                                    @PathVariable(ApplicationConstants.PATH_PARAM_BAY_ID)
+                                                                    String bayId
     ) {
-
+        ParkingDeallocateResponse parkingDeallocateResponse = deallocate.deAllocateSpot(parkingLotId, bayId);
+        return new ResponseEntity<>(parkingDeallocateResponse, HttpStatus.CREATED);
     }
 }

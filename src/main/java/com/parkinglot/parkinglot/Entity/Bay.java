@@ -9,7 +9,6 @@ import lombok.Data;
 public class Bay {
     @Id
     @Column(name = "BAY_ID")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @NotNull
     private int slotSize;

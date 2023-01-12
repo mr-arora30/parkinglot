@@ -25,7 +25,7 @@ public class Allocate {
     private final ResponseMapper responseMapper;
 
     @Transactional
-    public ParkingSlipResponse allocate(String parkingLotId, Vehicle vehicle) {
+    public ParkingSlipResponse allocateSpot(String parkingLotId, Vehicle vehicle) {
         Optional<List<Bay>> bayList = baysRepo.findAllByParkingLot_IdAndIsAvailable(parkingLotId, true);
         Optional<Bay> bay = getBayBySize(bayList, vehicle);
         ParkingSlip parkingSlip = null;
