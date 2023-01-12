@@ -17,7 +17,7 @@ v. If no XLarge is available then don’t print the slot, print no SLOT FOUND
 * DeallocationService: This service is responsible for freeing a spot which was previously allocated to car
 * ParkingDataService: This service is responsible for all data interactions with db
 
-**Coded solution has all these services as endpoint in a single service due to time constraint **
+**Coded solution has all these services as a seperated endpoints in a single service due to time constraint **
 
 **DB Schema:**
 
