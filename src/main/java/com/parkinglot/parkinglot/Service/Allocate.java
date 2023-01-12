@@ -10,6 +10,7 @@ import com.parkinglot.parkinglot.Model.Vehicle;
 import com.parkinglot.parkinglot.Repository.BaysRepo;
 import com.parkinglot.parkinglot.Repository.ParkingSlipRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class Allocate {
     private final BaysRepo baysRepo;
     private final ParkingSlipRepo parkingSlipRepo;
@@ -36,13 +38,15 @@ public class Allocate {
             parkingSlip = printParkingSlip(savedBay, vehicle);
 
         } else {
+            log.info("No Spot Found for parkingLotId: {}", parkingLotId);
             parkingSlip = ParkingSlip.builder()
                     .floorId(ApplicationConstants.NO_SLOT_FOUND)
                     .bayId(ApplicationConstants.NO_SLOT_FOUND)
                     .licensenseNo(vehicle.getLicenseNo())
                     .build();
         }
-
+        log.info("Spot Allocated for parkingLotId: {} at BayId: {} for vehichle licenseNo: {}",
+                parkingLotId, parkingSlip.getParkingLotId(), parkingSlip.getLicensenseNo());
         return responseMapper.parkingSlipToParkingSlipReponse(parkingSlip);
 
     }
