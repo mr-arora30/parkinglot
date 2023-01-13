@@ -49,7 +49,7 @@ v. If no XLarge is available then don’t print the slot, print no SLOT FOUND
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/parking/allocate/0ad828ee-9252-11ed-a1eb-0242ac120001",
+					"raw": "http://localhost:8080/parking/allocate/P101",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -58,7 +58,7 @@ v. If no XLarge is available then don’t print the slot, print no SLOT FOUND
 					"path": [
 						"parking",
 						"allocate",
-						"0ad828ee-9252-11ed-a1eb-0242ac120001"
+						"P101"
 					],
 					"query": [
 						{
@@ -76,12 +76,8 @@ v. If no XLarge is available then don’t print the slot, print no SLOT FOUND
 			"request": {
 				"method": "POST",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \n}"
-				},
 				"url": {
-					"raw": "http://localhost:8080/parking/deallocate/0ad828ee-9252-11ed-a1eb-0242ac120001/6f52bc60-9254-11ed-a1eb-0242ac120003",
+					"raw": "http://localhost:8080/parking/deallocate/P101/A1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -90,8 +86,8 @@ v. If no XLarge is available then don’t print the slot, print no SLOT FOUND
 					"path": [
 						"parking",
 						"deallocate",
-						"0ad828ee-9252-11ed-a1eb-0242ac120001",
-						"6f52bc60-9254-11ed-a1eb-0242ac120003"
+						"P101",
+						"A1"
 					]
 				}
 			},
