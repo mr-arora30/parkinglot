@@ -20,7 +20,7 @@ public class CacheManager {
     public static Map<String, Map<Integer, Queue<Bay>>> parkingLotCache;
     private static BaysRepo baysRepo;
     private static Deque<String> LRUCache;
-    private static final int CACHE_SIZE = 100;
+    private static final int CACHE_SIZE = 1;
     private static final boolean REFRESH = true;
     private static final boolean NO_REFRESH = false;
 
@@ -65,6 +65,9 @@ public class CacheManager {
                 refer(parkingLotId, i, REFRESH);
                 isCacheRefreshed = true;
                 parkingBaysMap = parkingLotCache.get(parkingLotId);
+                if(parkingBaysMap==null){
+                    continue;
+                }
             }
             if (null == parkingBaysMap.get(i)) {
                 refer(parkingLotId, i, REFRESH);
