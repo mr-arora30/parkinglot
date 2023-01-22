@@ -1,6 +1,7 @@
 package com.parkinglot.parkinglot.Service;
 
 
+import com.parkinglot.parkinglot.Cache.CacheManager;
 import com.parkinglot.parkinglot.Constants.ApplicationConstants;
 import com.parkinglot.parkinglot.Entity.Bay;
 import com.parkinglot.parkinglot.Entity.ParkingSlip;
@@ -14,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+
 
 @Service
 @AllArgsConstructor
@@ -28,15 +29,16 @@ public class Allocate {
 
     @Transactional
     public ParkingSlipResponse allocateSpot(String parkingLotId, Vehicle vehicle) {
-        Optional<List<Bay>> bayList = baysRepo.findAllByParkingLot_IdAndIsAvailable(parkingLotId, true);
-        Optional<Bay> bay = getBayBySize(bayList, vehicle);
-        ParkingSlip parkingSlip = null;
-        if (bay.isPresent()) {
-            Bay bayDao = bay.get();
-            bayDao.setIsAvailable(false);
-            Bay savedBay = baysRepo.save(bayDao);
-            parkingSlip = printParkingSlip(savedBay, vehicle);
+        if(null==CacheManager.parkingLotCache.get(parkingLotId)){
+            CacheManager.load(parkingLotId);
+        }
 
+        ParkingSlip parkingSlip = null;
+        Bay allotedBay=CacheManager.getAvailableSlotBySize(parkingLotId,vehicle.getSize());
+        if (null!=allotedBay) {
+            allotedBay.setIsAvailable(false);
+            Bay savedBay = baysRepo.save(allotedBay);
+            parkingSlip = printParkingSlip(savedBay, vehicle);
         } else {
             log.info("No Spot Found for parkingLotId: {}", parkingLotId);
             parkingSlip = ParkingSlip.builder()

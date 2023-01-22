@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface BaysRepo extends JpaRepository<Bay,String> {
 
     Optional<List<Bay>> findAllByParkingLot_IdAndIsAvailable(String parkingLot, Boolean isAvailable);
+    Optional<List<Bay>> findFirst100ByParkingLot_IdAndSlotSizeAndIsAvailable(String parkingLot,int slotSize, Boolean isAvailable);
 
 }
