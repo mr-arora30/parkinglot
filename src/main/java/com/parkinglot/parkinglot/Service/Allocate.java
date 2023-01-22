@@ -29,10 +29,6 @@ public class Allocate {
 
     @Transactional
     public ParkingSlipResponse allocateSpot(String parkingLotId, Vehicle vehicle) {
-        if(null==CacheManager.parkingLotCache.get(parkingLotId)){
-            CacheManager.load(parkingLotId);
-        }
-
         ParkingSlip parkingSlip = null;
         Bay allotedBay=CacheManager.getAvailableSlotBySize(parkingLotId,vehicle.getSize());
         if (null!=allotedBay) {

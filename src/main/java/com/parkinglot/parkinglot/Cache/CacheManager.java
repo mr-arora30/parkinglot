@@ -21,28 +21,18 @@ public class CacheManager {
     private static BaysRepo baysRepo;
     private static Deque<String> LRUCache;
     private static final int CACHE_SIZE = 100;
+    private static final boolean REFRESH = true;
+    private static final boolean NO_REFRESH = false;
 
 
     static {
         parkingLotCache = new ConcurrentHashMap<>();
-            LRUCache = new ConcurrentLinkedDeque<>();
+        LRUCache = new ConcurrentLinkedDeque<>();
     }
 
     @Autowired
     public void setBaysRepo(BaysRepo baysRepo) {
         CacheManager.baysRepo = baysRepo;
-    }
-
-    public static void load(String parkingLotId) {
-
-        if (null != parkingLotCache.get(parkingLotId)) {
-            return;
-        }
-        refreshCacheByVehicleSize(parkingLotId, VehicleSize.S.getSize());
-        refreshCacheByVehicleSize(parkingLotId, VehicleSize.M.getSize());
-        refreshCacheByVehicleSize(parkingLotId, VehicleSize.L.getSize());
-        refreshCacheByVehicleSize(parkingLotId, VehicleSize.XL.getSize());
-        updateLastUsed(parkingLotId);
     }
 
     private static void refreshCacheByVehicleSize(String parkingLotId, int vehicleSize) {
@@ -64,41 +54,53 @@ public class CacheManager {
 
     }
 
+    //lazily loads slots by size
     public static Bay getAvailableSlotBySize(String parkingLotId,
                                              VehicleSize vehicleSize) {
         Bay resultBay = null;
-
+        boolean isCacheRefreshed = false;
         Map<Integer, Queue<Bay>> parkingBaysMap = parkingLotCache.get(parkingLotId);
-        if (null != parkingBaysMap) {
-            for (int i = vehicleSize.getSize(); i <= vehicleSize.XL.getSize(); i++) {
+        for (int i = vehicleSize.getSize(); i <= vehicleSize.XL.getSize(); i++) {
+            if (parkingBaysMap == null) {
+                refer(parkingLotId, i, REFRESH);
+                isCacheRefreshed = true;
+                parkingBaysMap = parkingLotCache.get(parkingLotId);
+            }
+            if (null == parkingBaysMap.get(i)) {
+                refer(parkingLotId, i, REFRESH);
+                isCacheRefreshed = true;
+            }
+            if (parkingBaysMap != null && null != parkingBaysMap.get(i)) {
                 Queue<Bay> bays = parkingBaysMap.get(i);
+                if (bays.isEmpty()) {
+                    refer(parkingLotId, i, REFRESH);
+                    isCacheRefreshed = true;
+                    bays = parkingBaysMap.get(i);
+                }
                 if (!bays.isEmpty()) {
                     resultBay = bays.poll();
                     break;
-                } else {
-                    refreshCacheByVehicleSize(parkingLotId, i);
-                    bays = parkingBaysMap.get(i);
-                    if (!bays.isEmpty()) {
-                        resultBay = bays.poll();
-                        break;
-                    }
                 }
             }
         }
-        updateLastUsed(parkingLotId);
+        if (!isCacheRefreshed) {
+            refer(parkingLotId, vehicleSize.getSize(), NO_REFRESH);
+        }
         return resultBay;
     }
 
-    private static void updateLastUsed(String parkingLotId) {
-        if (parkingLotCache.containsKey(parkingLotId)) {
+    private static void refer(String parkingLotId, int vehicleSize, boolean isRefresh) {
+        if (!parkingLotCache.containsKey(parkingLotId)) {
             if (LRUCache.size() == CACHE_SIZE) {
                 String leastUsed = LRUCache.pollLast();
-                if (leastUsed.equals(parkingLotId)) {
-                    parkingLotCache.remove(leastUsed);
-                }
+                parkingLotCache.remove(leastUsed);
             }
+        } else {
             LRUCache.remove(parkingLotId);
-            LRUCache.offerFirst(parkingLotId);
+        }
+        LRUCache.offerFirst(parkingLotId);
+        if (isRefresh) {
+            refreshCacheByVehicleSize(parkingLotId, vehicleSize);
         }
     }
 }
